@@ -1,5 +1,4 @@
-#empiricalData = runif(10000,min = 1,max = 300)
-#empiricalData = rev(pm$pm[pm$city==""])
+
 category = function(PM25){
   PM25 = ceiling(PM25 / 30)
   unlist(lapply(PM25,FUN = function(X)min(X,10)))
@@ -36,13 +35,14 @@ P = GeneratePMatrix(empiricalData)
 
 predictionPM25 = function(pm,P){
   pm = category(pm)
-  labels = paste(seq(0,270,30),c(seq(31,271,30),"more"),sep="-")
+  labels = paste(seq(1,271,30),c(seq(30,270,30),"more"),sep="-")
   res = matrix(numeric(),nrow = 10,ncol = 1,dimnames = list(labels,c("Pr")))
   for(i in 1:10){
     res[i,1] = .predictPM25(pm,i,P)
   }
+  res[is.na(res)] = 0
   row.names(res) = labels
-  expect = sum(as.vector(res) * seq(30,270,length.out = 10),na.rm = T)
+  expect = sum(as.vector(res) * seq(30,by = 30,length.out = 10),na.rm = T)
   cat("Expected value:",expect,"\n")
   print(res)
   return(invisible(list(res,expect)))
